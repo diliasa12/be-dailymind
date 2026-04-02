@@ -1,7 +1,12 @@
 {
   "name": "be-dailymind",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "db:studio": "bunx drizzle-kit studio",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down",
+    "db:migration:generate": "npx drizzle-kit generate",
+    "db:migrate": "npx drizzle-kit migrate"
   },
   "dependencies": {
     "better-auth": "^1.5.6",
