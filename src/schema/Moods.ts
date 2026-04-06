@@ -9,7 +9,7 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth-schema";
-export const Moods = pgTable("moods", {
+export const moods = pgTable("moods", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -22,5 +22,5 @@ export const Moods = pgTable("moods", {
   note: text("note"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-export type Moods = typeof Moods.$inferSelect;
-export type NewMoods = typeof Moods.$inferInsert;
+export type Mood = typeof moods.$inferSelect;
+export type NewMood = typeof moods.$inferInsert;

@@ -12,7 +12,7 @@ import { users } from "./auth-schema";
 
 export const priorityEnum = pgEnum("priority", ["low", "medium", "high"]);
 
-export const Todos = pgTable("todos", {
+export const todos = pgTable("todos", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -25,5 +25,5 @@ export const Todos = pgTable("todos", {
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-export type Todos = typeof Todos.$inferSelect;
-export type NewTodos = typeof Todos.$inferInsert;
+export type Todo = typeof todos.$inferSelect;
+export type NewTodo = typeof todos.$inferInsert;

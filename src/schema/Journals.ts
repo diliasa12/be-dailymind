@@ -8,7 +8,7 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth-schema";
-export const Journals = pgTable("journals", {
+export const journals = pgTable("journals", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -21,5 +21,5 @@ export const Journals = pgTable("journals", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export type Journals = typeof Journals.$inferSelect;
-export type NewJournals = typeof Journals.$inferInsert;
+export type Journal = typeof journals.$inferSelect;
+export type NewJournal = typeof journals.$inferInsert;

@@ -10,5 +10,5 @@ export const feedbacks = pgTable("feedbacks", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export type Feedbacks = typeof feedbacks.$inferSelect;
-export type NewFeedbacks = typeof feedbacks.$inferInsert;
+export type Feedback = typeof feedbacks.$inferSelect;
+export type NewFeedback = typeof feedbacks.$inferInsert;
