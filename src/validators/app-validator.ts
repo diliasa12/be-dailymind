@@ -1,11 +1,5 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import {
-  moods,
-  pomodoros,
-  journals,
-  todos,
-  feedbacks,
-} from "../schema/app-schema";
+import { moods, pomodoros, journals, todos, feedbacks } from "@/schema";
 
 export const insertMoodSchema = createInsertSchema(moods);
 export const selectMoodSchema = createSelectSchema(moods);
