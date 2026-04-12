@@ -51,7 +51,7 @@ todoApp.patch("/:id", zValidator("json", updateTodoSchema), async (c) => {
     const id = Number(c.req.param("id"));
     const body = c.req.valid("json");
 
-    const updateData: any = { ...body };
+    const updateData: Partial<typeof todos.$inferInsert> = { ...body };
 
     if (body.isCompleted === true) {
         updateData.completedAt = new Date();

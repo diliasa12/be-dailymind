@@ -48,4 +48,5 @@ export const insertFeedbackSchema = createInsertSchema(feedbacks).omit({
   userId: true,
   createdAt: true,
 });
+export const updateFeedbackSchema = insertFeedbackSchema.partial();
 export const selectFeedbackSchema = createSelectSchema(feedbacks);
