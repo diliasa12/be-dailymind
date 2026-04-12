@@ -3,7 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { eq, and } from "drizzle-orm";
 import { db } from "../db/db";
 import { feedbacks } from "../schema/Feedbacks";
-import { insertFeedbackSchema } from "../validators/app-validator";
+import { insertFeedbackSchema, updateFeedbackSchema } from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { AppVariables } from "@/types/type";
 
@@ -61,7 +61,7 @@ feedbackApp.delete("/:id", async (c) => {
     return c.json({ data: deletedFeedback[0] });
 });
 
-feedbackApp.patch("/:id", zValidator("json", insertFeedbackSchema), async (c) => {
+feedbackApp.patch("/:id", zValidator("json", updateFeedbackSchema), async (c) => {
     const user = c.get("user");
     const id = Number(c.req.param("id"));
     const body = c.req.valid("json");
