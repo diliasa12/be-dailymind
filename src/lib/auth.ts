@@ -18,11 +18,12 @@ export const auth = betterAuth({
   },
   session: {
     cookieCache: {
-      enabled: false,
-      maxAge: 60 * 60 * 24,
+      enabled: true,
+      maxAge: 60 * 60,
     },
   },
-  trustedOrigins: ["http://localhost:5173", "http://localhost:3000"],
+  trustedOrigins: ["http://localhost:5173"],
+  baseURL: process.env.BETTER_AUTH_URL,
   socialProviders: {
     google: {
       accessType: "offline",
@@ -32,5 +33,3 @@ export const auth = betterAuth({
     },
   },
 });
-export type User = typeof auth.$Infer.Session.user;
-export type Session = typeof auth.$Infer.Session.session;

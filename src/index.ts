@@ -1,12 +1,19 @@
 import { Hono } from "hono";
 import { auth } from "@/lib/auth";
 import { cors } from "hono/cors";
-import { authMiddleware } from "./middlewares/auth.middlware";
+import { authMiddleware } from "./middlewares/auth.middleware";
 import { AppVariables } from "./types/type";
+
+import todoApp from "./routes/todos.route";
+import feedbackApp from "./routes/feedbacks.route";
+import pomodoroApp from "./routes/pomodoro.route";
+import moodApp from "./routes/moods.route";
+import journalApp from "./routes/journals.route";
 
 const app = new Hono<{
   Variables: AppVariables;
 }>();
+
 
 app.use(
   "*",
@@ -26,5 +33,11 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 app.get("/", (c) => {
   return c.text("hello dili");
 });
+
+app.route("/todos", todoApp);
+app.route("/feedbacks", feedbackApp);
+app.route("/pomodoros", pomodoroApp);
+app.route("/moods", moodApp);
+app.route("/journals", journalApp);
 
 export default app;
