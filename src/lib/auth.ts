@@ -22,7 +22,7 @@ export const auth = betterAuth({
       maxAge: 60 * 60,
     },
   },
-  trustedOrigins: ["http://localhost:5173"],
+  trustedOrigins: ["http://localhost:5173", "http://localhost:3000"],
   baseURL: process.env.BETTER_AUTH_URL,
   socialProviders: {
     google: {
