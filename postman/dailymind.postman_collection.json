@@ -1,0 +1,612 @@
+{
+  "info": {
+    "_postman_id": "9eeb4e55-3134-4e58-99ea-21c6bdb01174",
+    "name": "dailymind",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50379017",
+    "_collection_link": "https://go.postman.co/collection/50379017-9eeb4e55-3134-4e58-99ea-21c6bdb01174?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "sign-up",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"tester@dailymind.com\",\r\n  \"password\": \"password123\",\r\n  \"name\": \"Budi Tester\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/auth/sign-up/email",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "auth",
+            "sign-up",
+            "email"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "sign-in",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/auth/sign-in/email",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "auth",
+            "sign-in",
+            "email"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "post todos",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "gbAHRZL12AetPCmK9B8J4rVWVwObW7Vy",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"task\": \"Mukbang Nasi Padang\",\r\n  \"category\": \"Development\",\r\n  \"date\": \"2026-04-06\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/todos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "todos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get todos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/todos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "todos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "patch todos",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/todos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "todos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete todos",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/todos/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "todos",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "post feedbacks",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "wWK2NhOr5wTcSO6PbRV185fQBPQFjNl9",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"message\": \"Aplikasi sangat bagus, tolong tambahkan dark mode\",\r\n  \"rating\": 5\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/feedbacks",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "feedbacks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get feedbacks",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "wWK2NhOr5wTcSO6PbRV185fQBPQFjNl9",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/feedbacks",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "feedbacks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "patch feedbacks",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "wWK2NhOr5wTcSO6PbRV185fQBPQFjNl9",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"message\": \"manjat\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/feedbacks/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "feedbacks",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete feedbacks",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "wWK2NhOr5wTcSO6PbRV185fQBPQFjNl9",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/feedbacks/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "feedbacks",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "post journals",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "wWK2NhOr5wTcSO6PbRV185fQBPQFjNl9",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"CobaCobiLek\",\r\n  \"content\": \"Sedih banget hari ini\",\r\n  \"moodEmoji\": \"😭\",\r\n  \"tags\": [\"sedih\", \"curhat\", \"ngambek\"],\r\n  \"date\": \"2026-04-12\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/journals",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "journals"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get journals",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "wWK2NhOr5wTcSO6PbRV185fQBPQFjNl9",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/journals",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "journals"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "patch journals",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "wWK2NhOr5wTcSO6PbRV185fQBPQFjNl9",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"moodEmoji\": \"😎\",\r\n  \"tags\": [\"coding\", \"hono\", \"drizzle\", \"success\"]\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/journals/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "journals",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete journals",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/journals/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "journals",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "post moods",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "wWK2NhOr5wTcSO6PbRV185fQBPQFjNl9",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"date\": \"2026-04-12\",\r\n  \"value\": 3,\r\n  \"label\": \"Senang\",\r\n  \"emotions\": [\"gembira\", \"semangat\"],\r\n  \"factors\": [\"coding\", \"cuaca cerah\"],\r\n  \"note\": \"Hari ini mood sangat baik karena semua error berhasil diatasi.\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/moods",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "moods"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get moods",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "gbAHRZL12AetPCmK9B8J4rVWVwObW7Vy",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Origin",
+            "value": "http://localhost:5173",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"task\": \"Mukbang Nasi Padang\",\r\n  \"category\": \"Development\",\r\n  \"date\": \"2026-04-06\"\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/moods",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "moods"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
