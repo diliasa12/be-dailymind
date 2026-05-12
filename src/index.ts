@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { auth } from "@/lib/auth";
 import { cors } from "hono/cors";
-import { authMiddleware } from "./middlewares/auth.middleware";
+
 import { AppVariables } from "./types/type";
 
 import todoApp from "./routes/todos.route";
@@ -13,7 +13,6 @@ import journalApp from "./routes/journals.route";
 const app = new Hono<{
   Variables: AppVariables;
 }>();
-
 
 app.use(
   "*",
@@ -28,10 +27,6 @@ app.use(
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => {
   return auth.handler(c.req.raw);
-});
-
-app.get("/", (c) => {
-  return c.text("hello dili");
 });
 
 app.route("/todos", todoApp);

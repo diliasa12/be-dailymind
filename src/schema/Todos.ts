@@ -8,7 +8,7 @@ import {
   date,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth-schema";
+import { user } from "./auth-schema";
 
 export const priorityEnum = pgEnum("priority", ["low", "medium", "high"]);
 
@@ -16,7 +16,7 @@ export const todos = pgTable("todos", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
+    .references(() => user.id, { onDelete: "cascade" }),
   task: varchar("task", { length: 255 }).notNull(),
   isCompleted: boolean("is_completed").default(false).notNull(),
   priority: priorityEnum("priority").default("low").notNull(),
