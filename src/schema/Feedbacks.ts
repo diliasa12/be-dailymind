@@ -18,8 +18,8 @@ export const feedbacks = pgTable("feedbacks", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  category: feedbackCategory().notNull(),
-  rating: integer().notNull(),
+  category: feedbackCategory("category").notNull(),
+  rating: integer("rating").notNull(),
   message: text("message").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

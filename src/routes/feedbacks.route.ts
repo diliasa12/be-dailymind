@@ -84,7 +84,7 @@ feedbackApp.patch(
 
     const updatedFeedback = await db
       .update(feedbacks)
-      .set({ message: body.message })
+      .set(body)
       .where(and(eq(feedbacks.id, id), eq(feedbacks.userId, user!.id)))
       .returning();
 
