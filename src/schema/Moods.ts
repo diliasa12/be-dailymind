@@ -8,12 +8,12 @@ import {
   date,
   jsonb,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth-schema";
+import { user } from "./auth-schema";
 export const moods = pgTable("moods", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
+    .references(() => user.id, { onDelete: "cascade" }),
   date: date("date").notNull(),
   value: integer("value").notNull(),
   label: varchar("label", { length: 50 }).notNull(),

@@ -7,12 +7,12 @@ import {
   date,
   jsonb,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth-schema";
+import { user } from "./auth-schema";
 export const journals = pgTable("journals", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
+    .references(() => user.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
   moodEmoji: varchar("mood_emoji", { length: 10 }),

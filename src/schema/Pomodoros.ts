@@ -6,13 +6,13 @@ import {
   timestamp,
   date,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth-schema";
+import { user } from "./auth-schema";
 
 export const pomodoros = pgTable("pomodoros", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
+    .references(() => user.id, { onDelete: "cascade" }),
   date: date("date").notNull(),
   durationMinutes: integer("duration_minutes").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

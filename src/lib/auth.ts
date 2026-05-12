@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { admin } from "better-auth/plugins";
 import { db } from "@/db/db"; // your drizzle instance
 import * as schema from "@/schema/auth-schema";
 
@@ -7,7 +8,7 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
-      user: schema.users,
+      user: schema.user,
       session: schema.session,
       account: schema.account,
       verification: schema.verification,
@@ -32,4 +33,5 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
+  plugins: [admin()],
 });
