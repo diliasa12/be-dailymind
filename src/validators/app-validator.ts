@@ -1,52 +1,62 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { moods, pomodoros, journals, todos, feedbacks } from "@/schema";
 
-export const insertMoodSchema = createInsertSchema(moods).omit({
-  id: true,
-  userId: true,
-  createdAt: true,
-});
-export const selectMoodSchema = createSelectSchema(moods);
+// ─── Moods ────────────────────────────────────────────────────────────────────
 
-export const insertPomodoroSchema = createInsertSchema(pomodoros).omit({
-  id: true,
-  userId: true,
-  createdAt: true,
-});
-export const selectPomodoroSchema = createSelectSchema(pomodoros);
+export const insertMoodSchema = createInsertSchema(moods)
+  .omit({ id: true, userId: true, createdAt: true })
+  .meta({ id: "InsertMood" });
 
-export const insertJournalSchema = createInsertSchema(journals).omit({
-  id: true,
-  userId: true,
-  createdAt: true,
-});
-export const updateJournalSchema = createInsertSchema(journals).omit({
-  id: true,
-  userId: true,
-  createdAt: true,
-}).partial();
-export const selectJournalSchema = createSelectSchema(journals);
+export const selectMoodSchema = createSelectSchema(moods).meta({ id: "Mood" });
 
-export const insertTodoSchema = createInsertSchema(todos).omit({
-  id: true,
-  userId: true,
-  createdAt: true,
-  completedAt: true,
+// ─── Pomodoros ────────────────────────────────────────────────────────────────
+
+export const insertPomodoroSchema = createInsertSchema(pomodoros)
+  .omit({ id: true, userId: true, createdAt: true })
+  .meta({ id: "InsertPomodoro" });
+
+export const selectPomodoroSchema = createSelectSchema(pomodoros).meta({
+  id: "Pomodoro",
 });
+
+// ─── Journals ─────────────────────────────────────────────────────────────────
+
+export const insertJournalSchema = createInsertSchema(journals)
+  .omit({ id: true, userId: true, createdAt: true })
+  .meta({ id: "InsertJournal" });
+
+export const updateJournalSchema = createInsertSchema(journals)
+  .omit({ id: true, userId: true, createdAt: true })
+  .partial()
+  .meta({ id: "UpdateJournal" });
+
+export const selectJournalSchema = createSelectSchema(journals).meta({
+  id: "Journal",
+});
+
+// ─── Todos ────────────────────────────────────────────────────────────────────
+
+export const insertTodoSchema = createInsertSchema(todos)
+  .omit({ id: true, userId: true, createdAt: true, completedAt: true })
+  .meta({ id: "InsertTodo" });
 
 export const updateTodoSchema = createInsertSchema(todos)
-  .omit({
-    id: true,
-    userId: true,
-    createdAt: true,
-  })
-  .partial();
-export const selectTodoSchema = createSelectSchema(todos);
+  .omit({ id: true, userId: true, createdAt: true })
+  .partial()
+  .meta({ id: "UpdateTodo" });
 
-export const insertFeedbackSchema = createInsertSchema(feedbacks).omit({
-  id: true,
-  userId: true,
-  createdAt: true,
+export const selectTodoSchema = createSelectSchema(todos).meta({ id: "Todo" });
+
+// ─── Feedbacks ────────────────────────────────────────────────────────────────
+
+export const insertFeedbackSchema = createInsertSchema(feedbacks)
+  .omit({ id: true, userId: true, createdAt: true })
+  .meta({ id: "InsertFeedback" });
+
+export const updateFeedbackSchema = insertFeedbackSchema
+  .partial()
+  .meta({ id: "UpdateFeedback" });
+
+export const selectFeedbackSchema = createSelectSchema(feedbacks).meta({
+  id: "Feedback",
 });
-export const updateFeedbackSchema = insertFeedbackSchema.partial();
-export const selectFeedbackSchema = createSelectSchema(feedbacks);

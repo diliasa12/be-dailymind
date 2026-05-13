@@ -1,8 +1,3 @@
-/**
- * routes/todo.route.ts
- * npm install hono-openapi zod-openapi
- */
-
 import { Hono } from "hono";
 import { describeRoute, validator as zValidator, resolver } from "hono-openapi";
 import { eq, and } from "drizzle-orm";
@@ -12,6 +7,7 @@ import { todos } from "../schema/Todos";
 import {
   insertTodoSchema,
   updateTodoSchema,
+  selectTodoSchema,
 } from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { AppVariables } from "@/types/type";
@@ -22,18 +18,8 @@ todoApp.use("*", authMiddleware);
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
-const TodoSchema = z
-  .object({
-    id: z.number(),
-    title: z.string(),
-    isCompleted: z.boolean(),
-    completedAt: z.string().datetime().nullable(),
-    userId: z.string(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
-  })
-  .meta({ ref: "Todo" });
-
+const DataResponse = z.object({ data: selectTodoSchema });
+const ListResponse = z.object({ data: z.array(selectTodoSchema) });
 const ErrorSchema = z.object({ error: z.string() }).meta({ ref: "TodoError" });
 
 const ParamSchema = z.object({
@@ -54,7 +40,7 @@ todoApp.post(
         description: "Todo berhasil dibuat",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: TodoSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },
@@ -96,7 +82,7 @@ todoApp.get(
         description: "Daftar todo",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: z.array(TodoSchema) })),
+            schema: resolver(ListResponse),
           },
         },
       },
@@ -132,7 +118,7 @@ todoApp.get(
         description: "Todo ditemukan",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: TodoSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },
@@ -179,7 +165,7 @@ todoApp.patch(
         description: "Todo berhasil diperbarui",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: TodoSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },
@@ -240,7 +226,7 @@ todoApp.delete(
         description: "Todo berhasil dihapus",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: TodoSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },

@@ -4,26 +4,20 @@ import { eq, and, desc } from "drizzle-orm";
 import z from "zod";
 import { db } from "../db/db";
 import { pomodoros } from "../schema/Pomodoros";
-import { insertPomodoroSchema } from "../validators/app-validator";
+import {
+  insertPomodoroSchema,
+  selectPomodoroSchema,
+} from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { AppVariables } from "@/types/type";
 
 const pomodoroApp = new Hono<{ Variables: AppVariables }>();
+const ListResponse = z.object({ data: z.array(selectPomodoroSchema) });
+const DataResponse = z.object({ data: selectPomodoroSchema });
 
 pomodoroApp.use("*", authMiddleware);
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
-
-const PomodoroSchema = z
-  .object({
-    id: z.number(),
-    duration: z.number(),
-    label: z.string().nullable(),
-    userId: z.string(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
-  })
-  .meta({ ref: "Pomodoro" });
 
 const ErrorSchema = z
   .object({ error: z.string() })
@@ -47,7 +41,7 @@ pomodoroApp.post(
         description: "Pomodoro berhasil dicatat",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: PomodoroSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },
@@ -89,7 +83,7 @@ pomodoroApp.get(
         description: "Daftar sesi pomodoro",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: z.array(PomodoroSchema) })),
+            schema: resolver(ListResponse),
           },
         },
       },
@@ -126,7 +120,7 @@ pomodoroApp.delete(
         description: "Pomodoro berhasil dihapus",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: PomodoroSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },

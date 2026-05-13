@@ -1,15 +1,13 @@
-/**
- * routes/mood.route.ts
- * npm install hono-meta zod-meta
- */
-
 import { Hono } from "hono";
 import { describeRoute, validator as zValidator, resolver } from "hono-openapi";
 import { eq, and, desc } from "drizzle-orm";
 import z from "zod";
 import { db } from "../db/db";
 import { moods } from "../schema/Moods";
-import { insertMoodSchema } from "../validators/app-validator";
+import {
+  insertMoodSchema,
+  selectMoodSchema,
+} from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { AppVariables } from "@/types/type";
 
@@ -19,17 +17,8 @@ moodApp.use("*", authMiddleware);
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
-const MoodSchema = z
-  .object({
-    id: z.number(),
-    mood: z.string(),
-    note: z.string().nullable(),
-    userId: z.string(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
-  })
-  .meta({ ref: "Mood" });
-
+const DataResponse = z.object({ data: selectMoodSchema });
+const ListResponse = z.object({ data: z.array(selectMoodSchema) });
 const ErrorSchema = z.object({ error: z.string() }).meta({ ref: "MoodError" });
 
 const ParamSchema = z.object({
@@ -50,7 +39,7 @@ moodApp.post(
         description: "Mood berhasil dibuat",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: MoodSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },
@@ -93,7 +82,7 @@ moodApp.get(
         description: "Daftar mood",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: z.array(MoodSchema) })),
+            schema: resolver(ListResponse),
           },
         },
       },
@@ -130,7 +119,7 @@ moodApp.get(
         description: "Mood ditemukan",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: MoodSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },
@@ -176,7 +165,7 @@ moodApp.delete(
         description: "Mood berhasil dihapus",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: MoodSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },

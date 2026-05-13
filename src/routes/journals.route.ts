@@ -7,6 +7,7 @@ import { journals } from "../schema/Journals";
 import {
   insertJournalSchema,
   updateJournalSchema,
+  selectJournalSchema,
 } from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { AppVariables } from "@/types/type";
@@ -16,18 +17,8 @@ const journalApp = new Hono<{ Variables: AppVariables }>();
 journalApp.use("*", authMiddleware);
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
-
-const JournalSchema = z
-  .object({
-    id: z.number(),
-    title: z.string(),
-    content: z.string(),
-    userId: z.string(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
-  })
-  .meta({ ref: "Journal" });
-
+const DataResponse = z.object({ data: selectJournalSchema });
+const ListResponse = z.object({ data: z.array(selectJournalSchema) });
 const ErrorSchema = z
   .object({ error: z.string() })
   .meta({ ref: "JournalError" });
@@ -50,7 +41,7 @@ journalApp.post(
         description: "Jurnal berhasil dibuat",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: JournalSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },
@@ -93,7 +84,7 @@ journalApp.get(
         description: "Daftar jurnal",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: z.array(JournalSchema) })),
+            schema: resolver(ListResponse),
           },
         },
       },
@@ -130,7 +121,7 @@ journalApp.get(
         description: "Jurnal ditemukan",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: JournalSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },
@@ -176,7 +167,7 @@ journalApp.patch(
         description: "Jurnal berhasil diperbarui",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: JournalSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },
@@ -229,7 +220,7 @@ journalApp.delete(
         description: "Jurnal berhasil dihapus",
         content: {
           "application/json": {
-            schema: resolver(z.object({ data: JournalSchema })),
+            schema: resolver(DataResponse),
           },
         },
       },

@@ -1,12 +1,13 @@
 import { Hono } from "hono";
 import { describeRoute, validator as zValidator, resolver } from "hono-openapi";
 import { eq, and } from "drizzle-orm";
-import z from "zod";
+import { z } from "zod";
 import { db } from "../db/db";
 import { feedbacks } from "../schema/Feedbacks";
 import {
   insertFeedbackSchema,
   updateFeedbackSchema,
+  selectFeedbackSchema,
 } from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { AppVariables } from "@/types/type";
@@ -15,23 +16,13 @@ const feedbackApp = new Hono<{ Variables: AppVariables }>();
 
 feedbackApp.use("*", authMiddleware);
 
-// ─── Schemas ──────────────────────────────────────────────────────────────────
-
-const FeedbackSchema = z
-  .object({
-    id: z.number(),
-    message: z.string(),
-    rating: z.number().min(1).max(5),
-    category: z.string(),
-    userId: z.string(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
-  })
-  .meta({ ref: "Feedback" });
-
-const ErrorSchema = z
+// ─── Shared response schemas ───────────────────────────────────────────────────
+// Wrap selectFeedbackSchema langsung — tidak perlu definisikan ulang field-nya.
+const DataResponse = z.object({ data: selectFeedbackSchema });
+const ListResponse = z.object({ data: z.array(selectFeedbackSchema) });
+const ErrorResponse = z
   .object({ error: z.string() })
-  .meta({ ref: "FeedbackError" });
+  .meta({ ref: "Feedback Error" });
 
 const ParamSchema = z.object({
   id: z.string().regex(/^\d+$/, "ID harus berupa angka"),
@@ -49,19 +40,15 @@ feedbackApp.post(
     responses: {
       201: {
         description: "Feedback berhasil dikirim",
-        content: {
-          "application/json": {
-            schema: resolver(z.object({ data: FeedbackSchema })),
-          },
-        },
+        content: { "application/json": { schema: resolver(DataResponse) } },
       },
       400: {
         description: "Validasi gagal",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
       },
       401: {
         description: "Unauthorized",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
       },
     },
   }),
@@ -96,15 +83,11 @@ feedbackApp.get(
     responses: {
       200: {
         description: "Daftar feedback",
-        content: {
-          "application/json": {
-            schema: resolver(z.object({ data: z.array(FeedbackSchema) })),
-          },
-        },
+        content: { "application/json": { schema: resolver(ListResponse) } },
       },
       401: {
         description: "Unauthorized",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
       },
     },
   }),
@@ -132,19 +115,15 @@ feedbackApp.get(
     responses: {
       200: {
         description: "Feedback ditemukan",
-        content: {
-          "application/json": {
-            schema: resolver(z.object({ data: FeedbackSchema })),
-          },
-        },
+        content: { "application/json": { schema: resolver(DataResponse) } },
       },
       404: {
         description: "Feedback tidak ditemukan",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
       },
       401: {
         description: "Unauthorized",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
       },
     },
   }),
@@ -166,52 +145,6 @@ feedbackApp.get(
   },
 );
 
-// ─── DELETE /:id ──────────────────────────────────────────────────────────────
-
-feedbackApp.delete(
-  "/:id",
-  describeRoute({
-    tags: ["Feedbacks"],
-    summary: "Hapus feedback",
-    description: "Menghapus feedback berdasarkan ID.",
-    security: [{ bearerAuth: [] }],
-    responses: {
-      200: {
-        description: "Feedback berhasil dihapus",
-        content: {
-          "application/json": {
-            schema: resolver(z.object({ data: FeedbackSchema })),
-          },
-        },
-      },
-      404: {
-        description: "Feedback tidak ditemukan",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
-      },
-      401: {
-        description: "Unauthorized",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
-      },
-    },
-  }),
-  zValidator("param", ParamSchema),
-  async (c) => {
-    const user = c.get("user");
-    const id = Number(c.req.valid("param").id);
-
-    const deletedFeedback = await db
-      .delete(feedbacks)
-      .where(and(eq(feedbacks.id, id), eq(feedbacks.userId, user!.id)))
-      .returning();
-
-    if (deletedFeedback.length === 0) {
-      return c.json({ error: "Feedback tidak ditemukan" }, 404);
-    }
-
-    return c.json({ data: deletedFeedback[0] });
-  },
-);
-
 // ─── PATCH /:id ───────────────────────────────────────────────────────────────
 
 feedbackApp.patch(
@@ -219,28 +152,24 @@ feedbackApp.patch(
   describeRoute({
     tags: ["Feedbacks"],
     summary: "Update feedback",
-    description: "Memperbarui pesan feedback berdasarkan ID.",
+    description: "Memperbarui feedback berdasarkan ID.",
     security: [{ bearerAuth: [] }],
     responses: {
       200: {
         description: "Feedback berhasil diperbarui",
-        content: {
-          "application/json": {
-            schema: resolver(z.object({ data: FeedbackSchema })),
-          },
-        },
+        content: { "application/json": { schema: resolver(DataResponse) } },
       },
       400: {
         description: "Validasi gagal",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
       },
       404: {
         description: "Feedback tidak ditemukan",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
       },
       401: {
         description: "Unauthorized",
-        content: { "application/json": { schema: resolver(ErrorSchema) } },
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
       },
     },
   }),
@@ -262,6 +191,48 @@ feedbackApp.patch(
     }
 
     return c.json({ data: updatedFeedback[0] });
+  },
+);
+
+// ─── DELETE /:id ──────────────────────────────────────────────────────────────
+
+feedbackApp.delete(
+  "/:id",
+  describeRoute({
+    tags: ["Feedbacks"],
+    summary: "Hapus feedback",
+    description: "Menghapus feedback berdasarkan ID.",
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: "Feedback berhasil dihapus",
+        content: { "application/json": { schema: resolver(DataResponse) } },
+      },
+      404: {
+        description: "Feedback tidak ditemukan",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+      401: {
+        description: "Unauthorized",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+    },
+  }),
+  zValidator("param", ParamSchema),
+  async (c) => {
+    const user = c.get("user");
+    const id = Number(c.req.valid("param").id);
+
+    const deletedFeedback = await db
+      .delete(feedbacks)
+      .where(and(eq(feedbacks.id, id), eq(feedbacks.userId, user!.id)))
+      .returning();
+
+    if (deletedFeedback.length === 0) {
+      return c.json({ error: "Feedback tidak ditemukan" }, 404);
+    }
+
+    return c.json({ data: deletedFeedback[0] });
   },
 );
 
