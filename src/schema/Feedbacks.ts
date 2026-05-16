@@ -7,20 +7,29 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
-const feedbackCategory = pgEnum("category", [
+
+export const feedbackCategoryEnum = pgEnum("category", [
   "pujian",
   "saran fitur",
   "keluhan",
   "lainnya",
 ]);
+
+export const feedbackStatusEnum = pgEnum("feedback_status", [
+  "unread",
+  "read",
+  "resolved",
+]);
+
 export const feedbacks = pgTable("feedbacks", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  category: feedbackCategory("category").notNull(),
+  category: feedbackCategoryEnum("category").notNull(),
   rating: integer("rating").notNull(),
   message: text("message").notNull(),
+  status: feedbackStatusEnum("status").default("unread").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
