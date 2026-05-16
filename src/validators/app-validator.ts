@@ -1,62 +1,78 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { moods, pomodoros, journals, todos, feedbacks } from "@/schema";
+import {
+  moods,
+  pomodoros,
+  journals,
+  todos,
+  feedbacks,
+  bannedWords,
+} from "@/schema";
+import * as z from "zod";
 
 // ─── Moods ────────────────────────────────────────────────────────────────────
 
-export const insertMoodSchema = createInsertSchema(moods)
-  .omit({ id: true, userId: true, createdAt: true })
-  .meta({ id: "InsertMood" });
-
-export const selectMoodSchema = createSelectSchema(moods).meta({ id: "Mood" });
+// ─── Moods ────────────────────────────────────────────────────────────────────
 
 // ─── Pomodoros ────────────────────────────────────────────────────────────────
 
-export const insertPomodoroSchema = createInsertSchema(pomodoros)
-  .omit({ id: true, userId: true, createdAt: true })
-  .meta({ id: "InsertPomodoro" });
-
-export const selectPomodoroSchema = createSelectSchema(pomodoros).meta({
-  id: "Pomodoro",
+export const insertPomodoroSchema = createInsertSchema(pomodoros).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
 });
+export const selectPomodoroSchema = createSelectSchema(pomodoros);
 
 // ─── Journals ─────────────────────────────────────────────────────────────────
 
-export const insertJournalSchema = createInsertSchema(journals)
-  .omit({ id: true, userId: true, createdAt: true })
-  .meta({ id: "InsertJournal" });
-
+export const insertJournalSchema = createInsertSchema(journals).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+});
 export const updateJournalSchema = createInsertSchema(journals)
   .omit({ id: true, userId: true, createdAt: true })
-  .partial()
-  .meta({ id: "UpdateJournal" });
-
-export const selectJournalSchema = createSelectSchema(journals).meta({
-  id: "Journal",
-});
+  .partial();
+export const selectJournalSchema = createSelectSchema(journals);
 
 // ─── Todos ────────────────────────────────────────────────────────────────────
 
-export const insertTodoSchema = createInsertSchema(todos)
-  .omit({ id: true, userId: true, createdAt: true, completedAt: true })
-  .meta({ id: "InsertTodo" });
-
+export const insertTodoSchema = createInsertSchema(todos).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+  completedAt: true,
+});
 export const updateTodoSchema = createInsertSchema(todos)
   .omit({ id: true, userId: true, createdAt: true })
-  .partial()
-  .meta({ id: "UpdateTodo" });
-
-export const selectTodoSchema = createSelectSchema(todos).meta({ id: "Todo" });
+  .partial();
+export const selectTodoSchema = createSelectSchema(todos);
 
 // ─── Feedbacks ────────────────────────────────────────────────────────────────
 
-export const insertFeedbackSchema = createInsertSchema(feedbacks)
-  .omit({ id: true, userId: true, createdAt: true })
-  .meta({ id: "InsertFeedback" });
-
-export const updateFeedbackSchema = insertFeedbackSchema
-  .partial()
-  .meta({ id: "UpdateFeedback" });
-
-export const selectFeedbackSchema = createSelectSchema(feedbacks).meta({
-  id: "Feedback",
+export const insertFeedbackSchema = createInsertSchema(feedbacks).omit({
+  id: true,
+  userId: true,
+  createdAt: true,
+  status: true, // status di-set otomatis "unread" saat user kirim feedback
 });
+export const updateFeedbackSchema = insertFeedbackSchema.partial();
+export const selectFeedbackSchema = createSelectSchema(feedbacks);
+
+// Admin: hanya bisa update status feedback
+export const updateFeedbackStatusSchema = createInsertSchema(feedbacks).pick({
+  status: true,
+});
+
+// ─── Banned Words ─────────────────────────────────────────────────────────────
+
+export const insertBannedWordSchema = createInsertSchema(bannedWords)
+  .pick({
+    word: true,
+  })
+  .extend({
+    word: z
+      .string()
+      .min(1)
+      .transform((v) => v.trim()),
+  });
+export const selectBannedWordSchema = createSelectSchema(bannedWords);

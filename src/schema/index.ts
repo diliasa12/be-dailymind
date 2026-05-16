@@ -4,3 +4,4 @@ export * from "./Journals";
 export * from "./Moods";
 export * from "./Pomodoros";
 export * from "./Todos";
+export * from "./Bannedwords";
