@@ -9,35 +9,17 @@ import {
   selectBannedWordSchema,
 } from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
+import { adminMiddleware } from "../middlewares/admin.middleware";
 import { AppVariables } from "@/types/type";
 
 const bannedWordsApp = new Hono<{ Variables: AppVariables }>();
 
 bannedWordsApp.use("*", authMiddleware);
-
-// ─── Guard: Admin Only ────────────────────────────────────────────────────────
-
-bannedWordsApp.use("*", async (c, next) => {
-  const user = c.get("user") as
-    | (typeof import("@/lib/auth").auth.$Infer.Session.user & {
-        role?: string | null;
-      })
-    | null;
-
-  if (!user || user.role !== "admin") {
-    return c.json(
-      { error: "Forbidden: hanya admin yang dapat mengakses endpoint ini" },
-      403,
-    );
-  }
-
-  await next();
-});
+bannedWordsApp.use("*", adminMiddleware);
 
 // ─── Shared Schemas ───────────────────────────────────────────────────────────
 
 const ListResponse = z.object({ data: z.array(selectBannedWordSchema) });
-const DataResponse = z.object({ data: selectBannedWordSchema });
 const MessageResponse = z.object({
   message: z.string(),
   data: selectBannedWordSchema,
@@ -110,12 +92,12 @@ bannedWordsApp.post(
   zValidator("json", insertBannedWordSchema),
   async (c) => {
     const { word } = c.req.valid("json");
+    const normalized = word.toLowerCase();
 
-    // Cek apakah kata sudah ada
     const existing = await db
       .select()
       .from(bannedWords)
-      .where(eq(bannedWords.word, word.toLowerCase()));
+      .where(eq(bannedWords.word, normalized));
 
     if (existing.length > 0) {
       return c.json({ error: "Kata sudah terdaftar" }, 400);
@@ -123,7 +105,7 @@ bannedWordsApp.post(
 
     const newWord = await db
       .insert(bannedWords)
-      .values({ word: word.toLowerCase() })
+      .values({ word: normalized })
       .returning();
 
     return c.json(

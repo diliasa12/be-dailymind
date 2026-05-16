@@ -9,30 +9,13 @@ import {
   updateFeedbackStatusSchema,
 } from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
+import { adminMiddleware } from "../middlewares/admin.middleware";
 import { AppVariables } from "@/types/type";
 
 const adminFeedbackApp = new Hono<{ Variables: AppVariables }>();
 
 adminFeedbackApp.use("*", authMiddleware);
-
-// ─── Guard: Admin Only ────────────────────────────────────────────────────────
-
-adminFeedbackApp.use("*", async (c, next) => {
-  const user = c.get("user") as
-    | (typeof import("@/lib/auth").auth.$Infer.Session.user & {
-        role?: string | null;
-      })
-    | null;
-
-  if (!user || user.role !== "admin") {
-    return c.json(
-      { error: "Forbidden: hanya admin yang dapat mengakses endpoint ini" },
-      403,
-    );
-  }
-
-  await next();
-});
+adminFeedbackApp.use("*", adminMiddleware);
 
 // ─── Shared Schemas ───────────────────────────────────────────────────────────
 

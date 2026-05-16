@@ -7,6 +7,7 @@ import {
   feedbacks,
   bannedWords,
 } from "@/schema";
+import * as z from "zod";
 
 // ─── Moods ────────────────────────────────────────────────────────────────────
 
@@ -69,7 +70,14 @@ export const updateFeedbackStatusSchema = createInsertSchema(feedbacks).pick({
 
 // ─── Banned Words ─────────────────────────────────────────────────────────────
 
-export const insertBannedWordSchema = createInsertSchema(bannedWords).pick({
-  word: true,
-});
+export const insertBannedWordSchema = createInsertSchema(bannedWords)
+  .pick({
+    word: true,
+  })
+  .extend({
+    word: z
+      .string()
+      .min(1)
+      .transform((v) => v.trim()),
+  });
 export const selectBannedWordSchema = createSelectSchema(bannedWords);
