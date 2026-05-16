@@ -15,6 +15,8 @@ import adminFeedbackApp from "./routes/admin-feedbacks.route";
 import bannedWordsApp from "./routes/banned-words.route";
 
 // ─── Routes App ───────────────────────────────────────────────────────────────
+// Instance terpisah khusus untuk route aplikasi.
+// Dipisah agar openAPIRouteHandler bisa scan tanpa middleware global.
 
 const routes = new Hono<{ Variables: AppVariables }>();
 
@@ -23,6 +25,8 @@ routes.route("/feedbacks", feedbackApp);
 routes.route("/pomodoros", pomodoroApp);
 routes.route("/moods", moodApp);
 routes.route("/journals", journalApp);
+
+// ─── Main App ─────────────────────────────────────────────────────────────────
 routes.route("/admin/feedbacks", adminFeedbackApp);
 routes.route("/admin/banned-words", bannedWordsApp);
 
@@ -41,6 +45,7 @@ app.use(
   }),
 );
 
+// Better Auth handler
 app.on(["POST", "GET"], "/api/auth/*", (c) => {
   return auth.handler(c.req.raw);
 });

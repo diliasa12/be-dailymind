@@ -11,12 +11,7 @@ import * as z from "zod";
 
 // ─── Moods ────────────────────────────────────────────────────────────────────
 
-export const insertMoodSchema = createInsertSchema(moods).omit({
-  id: true,
-  userId: true,
-  createdAt: true,
-});
-export const selectMoodSchema = createSelectSchema(moods);
+// ─── Moods ────────────────────────────────────────────────────────────────────
 
 // ─── Pomodoros ────────────────────────────────────────────────────────────────
 

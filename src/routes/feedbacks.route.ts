@@ -1,11 +1,13 @@
 import { Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
+import { describeRoute, validator as zValidator, resolver } from "hono-openapi";
 import { eq, and } from "drizzle-orm";
+import { z } from "zod";
 import { db } from "../db/db";
 import { feedbacks } from "../schema/Feedbacks";
 import {
   insertFeedbackSchema,
   updateFeedbackSchema,
+  selectFeedbackSchema,
 } from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { AppVariables } from "@/types/type";
@@ -14,77 +16,173 @@ const feedbackApp = new Hono<{ Variables: AppVariables }>();
 
 feedbackApp.use("*", authMiddleware);
 
-feedbackApp.post("/", zValidator("json", insertFeedbackSchema), async (c) => {
-  const body = c.req.valid("json");
-  const user = c.get("user");
+// ─── Shared response schemas ───────────────────────────────────────────────────
+// Wrap selectFeedbackSchema langsung — tidak perlu definisikan ulang field-nya.
+const DataResponse = z.object({ data: selectFeedbackSchema });
+const ListResponse = z.object({ data: z.array(selectFeedbackSchema) });
+const ErrorResponse = z
+  .object({ error: z.string() })
+  .meta({ ref: "Feedback Error" });
 
-  const newFeedback = await db
-    .insert(feedbacks)
-    .values({
-      message: body.message,
-      rating: body.rating,
-      category: body.category,
-      userId: user!.id,
-    })
-    .returning();
-
-  return c.json({ data: newFeedback[0] }, 201);
+const ParamSchema = z.object({
+  id: z.string().regex(/^\d+$/, "ID harus berupa angka"),
 });
 
-feedbackApp.get("/", async (c) => {
-  const user = c.get("user");
+// ─── POST / ───────────────────────────────────────────────────────────────────
 
-  const data = await db
-    .select()
-    .from(feedbacks)
-    .where(eq(feedbacks.userId, user!.id));
+feedbackApp.post(
+  "/",
+  describeRoute({
+    tags: ["Feedbacks"],
+    summary: "Kirim feedback",
+    description: "Menyimpan feedback baru dari user yang sedang login.",
+    security: [{ bearerAuth: [] }],
+    responses: {
+      201: {
+        description: "Feedback berhasil dikirim",
+        content: { "application/json": { schema: resolver(DataResponse) } },
+      },
+      400: {
+        description: "Validasi gagal",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+      401: {
+        description: "Unauthorized",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+    },
+  }),
+  zValidator("json", insertFeedbackSchema),
+  async (c) => {
+    const body = c.req.valid("json");
+    const user = c.get("user");
 
-  return c.json({ data });
-});
+    const newFeedback = await db
+      .insert(feedbacks)
+      .values({
+        message: body.message,
+        rating: body.rating,
+        category: body.category,
+        userId: user!.id,
+      })
+      .returning();
 
-feedbackApp.get("/:id", async (c) => {
-  const user = c.get("user");
-  const id = Number(c.req.param("id"));
+    return c.json({ data: newFeedback[0] }, 201);
+  },
+);
 
-  const data = await db
-    .select()
-    .from(feedbacks)
-    .where(and(eq(feedbacks.id, id), eq(feedbacks.userId, user!.id)));
+// ─── GET / ────────────────────────────────────────────────────────────────────
 
-  if (data.length === 0) {
-    return c.json({ error: "Feedback tidak ditemukan" }, 404);
-  }
+feedbackApp.get(
+  "/",
+  describeRoute({
+    tags: ["Feedbacks"],
+    summary: "Daftar semua feedback",
+    description: "Mengambil semua feedback milik user yang sedang login.",
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: "Daftar feedback",
+        content: { "application/json": { schema: resolver(ListResponse) } },
+      },
+      401: {
+        description: "Unauthorized",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+    },
+  }),
+  async (c) => {
+    const user = c.get("user");
 
-  return c.json({ data: data[0] });
-});
+    const data = await db
+      .select()
+      .from(feedbacks)
+      .where(eq(feedbacks.userId, user!.id));
 
-feedbackApp.delete("/:id", async (c) => {
-  const user = c.get("user");
-  const id = Number(c.req.param("id"));
+    return c.json({ data });
+  },
+);
 
-  const deletedFeedback = await db
-    .delete(feedbacks)
-    .where(and(eq(feedbacks.id, id), eq(feedbacks.userId, user!.id)))
-    .returning();
+// ─── GET /:id ─────────────────────────────────────────────────────────────────
 
-  if (deletedFeedback.length === 0) {
-    return c.json({ error: "Feedback tidak ditemukan" }, 404);
-  }
+feedbackApp.get(
+  "/:id",
+  describeRoute({
+    tags: ["Feedbacks"],
+    summary: "Detail feedback",
+    description: "Mengambil satu feedback berdasarkan ID.",
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: "Feedback ditemukan",
+        content: { "application/json": { schema: resolver(DataResponse) } },
+      },
+      404: {
+        description: "Feedback tidak ditemukan",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+      401: {
+        description: "Unauthorized",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+    },
+  }),
+  zValidator("param", ParamSchema),
+  async (c) => {
+    const user = c.get("user");
+    const id = Number(c.req.valid("param").id);
 
-  return c.json({ data: deletedFeedback[0] });
-});
+    const data = await db
+      .select()
+      .from(feedbacks)
+      .where(and(eq(feedbacks.id, id), eq(feedbacks.userId, user!.id)));
+
+    if (data.length === 0) {
+      return c.json({ error: "Feedback tidak ditemukan" }, 404);
+    }
+
+    return c.json({ data: data[0] });
+  },
+);
+
+// ─── PATCH /:id ───────────────────────────────────────────────────────────────
 
 feedbackApp.patch(
   "/:id",
+  describeRoute({
+    tags: ["Feedbacks"],
+    summary: "Update feedback",
+    description: "Memperbarui feedback berdasarkan ID.",
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: "Feedback berhasil diperbarui",
+        content: { "application/json": { schema: resolver(DataResponse) } },
+      },
+      400: {
+        description: "Validasi gagal",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+      404: {
+        description: "Feedback tidak ditemukan",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+      401: {
+        description: "Unauthorized",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+    },
+  }),
+  zValidator("param", ParamSchema),
   zValidator("json", updateFeedbackSchema),
   async (c) => {
     const user = c.get("user");
-    const id = Number(c.req.param("id"));
+    const id = Number(c.req.valid("param").id);
     const body = c.req.valid("json");
 
     const updatedFeedback = await db
       .update(feedbacks)
-      .set(body)
+      .set({ message: body.message })
       .where(and(eq(feedbacks.id, id), eq(feedbacks.userId, user!.id)))
       .returning();
 
@@ -93,6 +191,48 @@ feedbackApp.patch(
     }
 
     return c.json({ data: updatedFeedback[0] });
+  },
+);
+
+// ─── DELETE /:id ──────────────────────────────────────────────────────────────
+
+feedbackApp.delete(
+  "/:id",
+  describeRoute({
+    tags: ["Feedbacks"],
+    summary: "Hapus feedback",
+    description: "Menghapus feedback berdasarkan ID.",
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: "Feedback berhasil dihapus",
+        content: { "application/json": { schema: resolver(DataResponse) } },
+      },
+      404: {
+        description: "Feedback tidak ditemukan",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+      401: {
+        description: "Unauthorized",
+        content: { "application/json": { schema: resolver(ErrorResponse) } },
+      },
+    },
+  }),
+  zValidator("param", ParamSchema),
+  async (c) => {
+    const user = c.get("user");
+    const id = Number(c.req.valid("param").id);
+
+    const deletedFeedback = await db
+      .delete(feedbacks)
+      .where(and(eq(feedbacks.id, id), eq(feedbacks.userId, user!.id)))
+      .returning();
+
+    if (deletedFeedback.length === 0) {
+      return c.json({ error: "Feedback tidak ditemukan" }, 404);
+    }
+
+    return c.json({ data: deletedFeedback[0] });
   },
 );
 
