@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { auth } from "@/lib/auth";
 import { cors } from "hono/cors";
-import { handle } from "hono/vercel";
 import { openAPIRouteHandler } from "hono-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 
@@ -111,4 +110,6 @@ app.get(
 
 app.get("/ui", swaggerUI({ url: "/openapi.json" }));
 
-export default handle(app);
+export default {
+  fetch: app.fetch,
+};
