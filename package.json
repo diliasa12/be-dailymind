@@ -1,5 +1,6 @@
 {
   "name": "be-dailymind",
+  "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build": "tsc",
@@ -28,6 +29,7 @@
     "@types/bun": "latest",
     "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.31.10",
+    "tsc-alias": "^1.8.17",
     "tsx": "^4.21.0"
   }
 }
