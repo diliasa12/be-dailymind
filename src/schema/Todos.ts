@@ -20,7 +20,6 @@ export const todos = pgTable("todos", {
   task: varchar("task", { length: 255 }).notNull(),
   isCompleted: boolean("is_completed").default(false).notNull(),
   priority: priorityEnum("priority").default("low").notNull(),
-  category: varchar("category", { length: 50 }),
   date: date("date").notNull(),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
