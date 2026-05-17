@@ -2,6 +2,8 @@
   "name": "be-dailymind",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "db:studio": "bunx drizzle-kit studio",
     "db:up": "docker-compose up -d",
     "db:down": "docker-compose down",
