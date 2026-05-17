@@ -13,6 +13,7 @@ import moodApp from "./routes/moods.route";
 import journalApp from "./routes/journals.route";
 import adminFeedbackApp from "./routes/admin-feedbacks.route";
 import bannedWordsApp from "./routes/banned-words.route";
+import pingRoute from "./routes/ping.route";
 
 // ─── Routes App ───────────────────────────────────────────────────────────────
 // Instance terpisah khusus untuk route aplikasi.
@@ -51,6 +52,7 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 });
 
 app.route("/", routes);
+app.route("/api/ping", pingRoute);
 
 // ─── OpenAPI Spec ──────────────────────────────────────────────────────────────
 
