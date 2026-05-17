@@ -13,11 +13,7 @@ export const journals = pgTable("journals", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
-  moodEmoji: varchar("mood_emoji", { length: 10 }),
-  tags: jsonb("tags").default([]).notNull(),
-  date: date("date").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
