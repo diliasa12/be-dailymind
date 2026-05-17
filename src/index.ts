@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { auth } from "@/lib/auth";
 import { cors } from "hono/cors";
+import { handle } from "hono/vercel";
 import { openAPIRouteHandler } from "hono-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 
@@ -38,7 +39,11 @@ const app = new Hono<{ Variables: AppVariables }>();
 app.use(
   "*",
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      process.env.FRONTEND_URL ?? "",
+    ],
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization", "Cookie"],
     exposeHeaders: ["Content-Length", "Set-Cookie"],
@@ -106,4 +111,4 @@ app.get(
 
 app.get("/ui", swaggerUI({ url: "/openapi.json" }));
 
-export default app;
+export default handle(app);
