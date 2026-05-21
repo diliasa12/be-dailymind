@@ -6,6 +6,7 @@ import * as schema from "@/schema/auth-schema";
 import { openAPI } from "better-auth/plugins";
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -29,6 +30,15 @@ export const auth = betterAuth({
     "http://localhost:3000",
     process.env.FRONTEND_URL ?? "",
   ],
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: false,
+    },
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+    },
+  },
   baseURL: process.env.BETTER_AUTH_URL,
   socialProviders: {
     google: {

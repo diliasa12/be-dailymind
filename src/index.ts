@@ -42,7 +42,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:3000",
       process.env.FRONTEND_URL ?? "",
-    ],
+    ].filter(Boolean),
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization", "Cookie"],
     exposeHeaders: ["Content-Length", "Set-Cookie"],
