@@ -20,7 +20,9 @@ import pingRoute from "./routes/ping.route";
 // Dipisah agar openAPIRouteHandler bisa scan tanpa middleware global.
 
 const routes = new Hono<{ Variables: AppVariables }>();
-
+routes.get("/", async (c) => {
+  return c.json({ success: true, message: "Hello Dailymind" }, 200);
+});
 routes.route("/todos", todoApp);
 routes.route("/feedbacks", feedbackApp);
 routes.route("/pomodoros", pomodoroApp);
