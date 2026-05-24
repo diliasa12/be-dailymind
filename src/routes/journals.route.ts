@@ -129,16 +129,26 @@ journalApp.get(
   async (c) => {
     // Ambil semua jurnal dan banned words secara paralel
     const [data, banned] = await Promise.all([
-      db.select().from(journals).orderBy(desc(journals.createdAt)),
+      db.select().from(journals).orderBy(desc(journals.createdAt)).limit(50),
       db.select().from(bannedWords),
     ]);
 
     // Buat regex dari semua kata terlarang
     const bannedList = banned.map((b) => b.word);
-
+    const pattern =
+      bannedList.length > 0
+        ? new RegExp(
+            bannedList
+              .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+              .join("|"),
+            "gi",
+          )
+        : null;
     const filtered = data.map((journal) => ({
       ...journal,
-      content: censorContent(journal.content, bannedList),
+      content: pattern
+        ? journal.content.replace(pattern, (match) => "*".repeat(match.length))
+        : journal.content,
     }));
 
     return c.json({ data: filtered });
