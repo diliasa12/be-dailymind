@@ -15,7 +15,6 @@ import { AppVariables } from "@/types/type";
 const bannedWordsApp = new Hono<{ Variables: AppVariables }>();
 
 bannedWordsApp.use("*", authMiddleware);
-bannedWordsApp.use("*", adminMiddleware);
 
 // ─── Shared Schemas ───────────────────────────────────────────────────────────
 
@@ -34,10 +33,9 @@ const ParamSchema = z.object({
 bannedWordsApp.get(
   "/",
   describeRoute({
-    tags: ["Banned Words (Admin)"],
+    tags: ["Banned Words"],
     summary: "Daftar kata terlarang",
-    description:
-      "Mengambil seluruh daftar kata terlarang yang aktif. Hanya admin.",
+    description: "Mengambil seluruh daftar kata terlarang yang aktif.",
     security: [{ bearerAuth: [] }],
     responses: {
       200: {
@@ -64,6 +62,7 @@ bannedWordsApp.get(
 
 bannedWordsApp.post(
   "/",
+  adminMiddleware,
   describeRoute({
     tags: ["Banned Words (Admin)"],
     summary: "Tambah kata terlarang",
@@ -119,6 +118,7 @@ bannedWordsApp.post(
 
 bannedWordsApp.delete(
   "/:id",
+  adminMiddleware,
   describeRoute({
     tags: ["Banned Words (Admin)"],
     summary: "Hapus kata terlarang",
