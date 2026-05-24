@@ -11,7 +11,7 @@ import {
 } from "../validators/app-validator";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { AppVariables } from "@/types/type";
-
+import { bannedWords } from "@/schema/Bannedwords";
 const journalApp = new Hono<{ Variables: AppVariables }>();
 
 journalApp.use("*", authMiddleware);
@@ -106,7 +106,44 @@ journalApp.get(
     return c.json({ data });
   },
 );
+// GET /journals/timeline
+journalApp.get(
+  "/timeline",
+  describeRoute({
+    tags: ["Journals"],
+    summary: "Timeline jurnal",
+    description:
+      "Mengambil semua jurnal dari semua user dengan sensor kata terlarang.",
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: "Timeline jurnal",
+        content: { "application/json": { schema: resolver(ListResponse) } },
+      },
+      401: {
+        description: "Unauthorized",
+        content: { "application/json": { schema: resolver(ErrorSchema) } },
+      },
+    },
+  }),
+  async (c) => {
+    // Ambil semua jurnal dan banned words secara paralel
+    const [data, banned] = await Promise.all([
+      db.select().from(journals).orderBy(desc(journals.createdAt)),
+      db.select().from(bannedWords),
+    ]);
 
+    // Buat regex dari semua kata terlarang
+    const bannedList = banned.map((b) => b.word);
+
+    const filtered = data.map((journal) => ({
+      ...journal,
+      content: censorContent(journal.content, bannedList),
+    }));
+
+    return c.json({ data: filtered });
+  },
+);
 // ─── GET /:id ─────────────────────────────────────────────────────────────────
 
 journalApp.get(
@@ -252,4 +289,16 @@ journalApp.delete(
   },
 );
 
+function censorContent(text: string, bannedList: string[]): string {
+  if (bannedList.length === 0) return text;
+
+  // Buat regex yang match semua kata terlarang, case-insensitive
+  const pattern = new RegExp(
+    bannedList.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"),
+    "gi",
+  );
+
+  // Ganti kata terlarang dengan bintang sesuai panjang kata
+  return text.replace(pattern, (match) => "*".repeat(match.length));
+}
 export default journalApp;
